@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API-Only Development Environment</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1c0f23 0%, #2e1a3e 100%);
+            color: #a020f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .disclaimer {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            max-width: 600px;
+            margin: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .disclaimer h1 {
+            color: #ff0000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .disclaimer p {
+            color: #ffaaaa;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .api-environment {
+            background: rgba(160, 32, 240, 0.1);
+            border: 2px solid #a020f0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            max-width: 800px;
+            margin: 20px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .api-environment h1 {
+            color: #a020f0;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #a020f0;
+        }
+
+        .terminal {
+            background: #000;
+            border: 1px solid #a020f0;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 20px rgba(160, 32, 240, 0.3);
+        }
+
+        .prompt {
+            color: #a020f0;
+        }
+
+        .command {
+            color: #ffffff;
+            margin: 10px 0;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #a020f0;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(160, 32, 240, 0.3); }
+            to { box-shadow: 0 0 30px rgba(160, 32, 240, 0.6); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #a020f0;
+            margin-right: 10px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading"></div>
+    
+    <div id="content" style="display: none;">
+        <!-- Content will be populated based on creator check -->
+    </div>
+
+    <script>
+        async function initializeSite() {
+            try {
+                // Get the creator of this page
+                const creator = await window.websim.getCreator();
+                const content = document.getElementById('content');
+                const loading = document.getElementById('loading');
+                
+                // Hide loading spinner
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                
+                // Check if creator is 'api' user
+                if (!creator || (creator.username !== 'api' && creator.username !== '@api')) {
+                    // Show disclaimer for unauthorized users
+                    content.innerHTML = `
+                        <div class="disclaimer">
+                            <h1>⚠️ UNAUTHORIZED ACCESS ⚠️</h1>
+                            <p><strong>Please do not remix this page!</strong></p>
+                            <p>This is a restricted development environment designed exclusively for API operations.</p>
+                            <p>Current user: ${creator ? '@' + creator.username : 'Unknown'}</p>
+                            <p>Only the @api user is authorized to access this environment.</p>
+                            <p>Please return to the original version or create your own project.</p>
+                        </div>
+                    `;
+                } else {
+                    // Show functional site for authorized api user
+                    content.innerHTML = `
+                        <div class="api-environment">
+                            <h1><span class="status-indicator"></span>API Development Environment</h1>
+                            <p>Welcome, @${creator.username}! You have full access to this restricted environment.</p>
+                            
+                            <div class="terminal">
+                                <div class="prompt">api@websim:~$</div>
+                                <div class="command">System Status: <span style="color: #a020f0;">ACTIVE</span></div>
+                                <div class="command">Authorization: <span style="color: #a020f0;">VERIFIED</span></div>
+                                <div class="command">Access Level: <span style="color: #a020f0;">FULL PRIVILEGES</span></div>
+                                <div class="prompt">api@websim:~$</div>
+                                <div class="command">Ready for development operations...</div>
+                            </div>
+                            
+                            <p>This environment is protected against unauthorized remixing.</p>
+                            <p>All systems operational and ready for API development.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                // Handle any errors in creator detection
+                const content = document.getElementById('content');
+                const loading = document.getElementById('loading');
+                
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                content.innerHTML = `
+                    <div class="disclaimer">
+                        <h1>⚠️ ACCESS DENIED ⚠️</h1>
+                        <p><strong>Please do not remix this page!</strong></p>
+                        <p>Unable to verify authorization. This environment is restricted to the @api user only.</p>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize the site when the page loads
+        document.addEventListener('DOMContentLoaded', initializeSite);
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
